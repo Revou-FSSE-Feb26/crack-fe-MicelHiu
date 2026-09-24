@@ -5,11 +5,6 @@ import { usePromotions } from "@/hooks/usePromotions";
 import { createPromotion, deletePromotion, updatePromotion } from "@/lib/dataRoute";
 import { formatPrice } from "@/lib/data";
 
-function isActive(validFrom: string, validUntil: string) {
-    const now = Date.now();
-    return new Date(validFrom).getTime() <= now && now <= new Date(validUntil).getTime();
-}
-
 export default function PromotionsManager() {
     const { promotions, isLoading, error, refetch } = usePromotions();
     const [name, setName] = useState("");
@@ -37,8 +32,8 @@ export default function PromotionsManager() {
         }
     }
 
-    async function handleToggleActive(id: string, currentlyActive: boolean) {
-        await updatePromotion(id, { is_active: !currentlyActive });
+    async function handleToggleAdminDisabled(id: string, currentlyDisabled: boolean) {
+        await updatePromotion(id, { admin_disabled: !currentlyDisabled });
         refetch();
     }
 
@@ -113,7 +108,6 @@ export default function PromotionsManager() {
                     ) : (
                         <ul className="flex flex-col divide-y divide-ink/10">
                             {promotions.map((promo) => {
-                                const active = isActive(promo.valid_from, promo.valid_until);
                                 return (
                                     <li key={promo.id} className="flex flex-col sm:flex-row sm:items-center justify-between py-3 gap-3">
                                         <div>
@@ -125,15 +119,24 @@ export default function PromotionsManager() {
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <span className="text-accent text-sm font-semibold">{formatPrice(promo.value)}</span>
-                                            <button
-                                                onClick={() => handleToggleActive(promo.id, active)}
-                                                className={`text-[10px] font-medium px-2 py-1 rounded-full transition-colors ${
-                                                    active
+                                            <span
+                                                className={`text-[10px] font-medium px-2 py-1 rounded-full ${
+                                                    promo.is_active
                                                         ? "bg-accent/20 text-accent"
                                                         : "bg-ink/10 text-ink/70"
                                                 }`}
                                             >
-                                                {active ? "Active" : "Inactive"}
+                                                {promo.is_active ? "Active" : "Inactive"}
+                                            </span>
+                                            <button
+                                                onClick={() => handleToggleAdminDisabled(promo.id, promo.admin_disabled)}
+                                                className={`text-[10px] font-medium px-2 py-1 rounded-full transition-colors ${
+                                                    promo.admin_disabled
+                                                        ? "bg-accent/20 text-accent"
+                                                        : "bg-ink/10 text-ink/70"
+                                                }`}
+                                            >
+                                                {promo.admin_disabled ? "Aktifkan lagi" : "Nonaktifkan"}
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(promo.id)}

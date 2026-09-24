@@ -9,6 +9,8 @@ export interface DiscountFromApi {
     value: number; // Prisma Decimal dikirim sbg string via JSON
     valid_until: string;
     valid_from: string;
+    is_active: boolean;
+    admin_disabled: boolean;
 }
 
 export interface CreatePromotionPayload {
@@ -19,7 +21,7 @@ export interface CreatePromotionPayload {
 }
 
 export type UpdatePromotionPayload = Partial<CreatePromotionPayload> & {
-    is_active?: boolean;
+    admin_disabled?: boolean;
 };
 
 export async function getPromotions(): Promise<DiscountFromApi[]> {
@@ -33,7 +35,9 @@ export async function getPromotions(): Promise<DiscountFromApi[]> {
         name: d.name,
         value: d.value,
         valid_until: d.valid_until,
-        valid_from: d.valid_from
+        valid_from: d.valid_from,
+        is_active: d.is_active,
+        admin_disabled: d.admin_disabled
     }));
 }
 
